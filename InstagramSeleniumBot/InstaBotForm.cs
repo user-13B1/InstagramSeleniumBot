@@ -34,7 +34,7 @@ namespace InstagramSeleniumBot
             bots = new List<Bot>();
 
            
-            //Task.Run(() => Launch(new Info(console, ref EndWorkEvent, "InstaBot"), 50));
+            Task.Run(() => Launch(new Info(console, ref EndWorkEvent, "InstaBot"), 50));
             Task.Run(() => Launch(new CollectingAccounts(console, ref EndWorkEvent,"InstaBot"), 50));
             Task.Run(() => Launch(new ProcessingAccounts(console, ref EndWorkEvent, "InstaBot"),50));
             Task.Run(() => Launch(new SubscribeAccounts(console,  ref EndWorkEvent, "InstaBot"),  5));
