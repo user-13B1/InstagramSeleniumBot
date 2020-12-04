@@ -16,7 +16,7 @@ namespace InstagramSeleniumBot
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormBot());
+            Application.Run(new Form());
         }
     }
 }

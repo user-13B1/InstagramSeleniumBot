@@ -18,30 +18,37 @@ using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace InstagramSeleniumBot
 {
-    internal abstract class Bot
+    public abstract class Bot
     {
         private protected Writer Cons;
         private protected DBmanager db;
         private protected ChromeBrowser Chrome { get; set; }
         private protected static Random rand;
-        internal string Name { get; set; }
-        static int profileCounter=0;
+        public bool stop;
+        private protected CancellationToken token;
 
-        public Bot(Writer console,ref Action EndWorkEvent,string botProfileName)
+        public Bot(Writer console, CancellationToken token)
         {
+            if (token.IsCancellationRequested)
+                return;
+
+            this.token = token;
             Cons = console;
+
+            Cons.WriteLine($"Загрузка бота.");
             db = new DBmanager(console);
             rand = new Random();
-            string chromeProfileName = (++profileCounter).ToString() + botProfileName;
-            Cons.WriteLine($"Загрузка бота.");
-            Chrome = new ChromeBrowser(chromeProfileName);
+            Chrome = new ChromeBrowser("InstagramBotProfile");
             Chrome.SetWindowSize(500, 1000);
-            EndWorkEvent += () => Close();
+            this.Cons.WriteLine($"Бот загружен.");
         }
 
 
-        internal void Autorize(string login, string password)
+        public void Autorize(string login, string password)
         {
+            if (token.IsCancellationRequested)
+                return;
+
             db.Name = login;
             int delay = rand.Next(100);
             Thread.Sleep(delay);
@@ -51,36 +58,37 @@ namespace InstagramSeleniumBot
          
             if (Chrome.FindWebElement(By.XPath("//a[@href ='/direct/inbox/']"))!=null)
             {
-                Cons.WriteLine($"{Name}: Пользователь авторизован.");
+                Cons.WriteLine($"Пользователь авторизован.");
                 return;
             }
-            
-            Cons.WriteLine($"{Name}: Авторизация пользователя");
+
+            Cons.WriteLine($"Авторизация пользователя");
             Chrome.SendKeysXPath(@"//*[@id='loginForm']/div/div[1]/div/label/input", login);
             Chrome.SendKeysXPath(@"//*[@id='loginForm']/div/div[2]/div/label/input", password);
             Thread.Sleep(300);
             Chrome.ClickButtonXPath(@"//*[@id='loginForm']/div/div[3]/button");
 
             CheckAutorize();
-           
         }
 
         private void CheckAutorize()
         {
-            Cons.WriteLine($"{Name}: Проверка авторизации.");
+            if (token.IsCancellationRequested)
+                return;
+
+            Cons.WriteLine($"Проверка авторизации.");
             if (Chrome.FindWebElement(By.XPath("//a[@href ='/direct/inbox/']")) == null)
             {
-                Cons.WriteLine($"{Name}: Ошибка авторизации.");
+                Cons.WriteLine($"Ошибка авторизации.");
                 Close();
             }
-            Cons.WriteLine($"{Name}: Авторизовано.");
+            Cons.WriteLine($"Авторизовано.");
         }
 
-        internal void Close()
+        public void Close()
         {
-            Cons.WriteLine($"{Name}: Close.");
-            Task.Run(() => Chrome.Quit());
-         
+            if(Chrome != null)
+                Chrome.Quit();
         }
 
         internal int ParsToInt(string text)
@@ -102,8 +110,11 @@ namespace InstagramSeleniumBot
             return num;
         }
 
-        internal bool CheckConnectInternet()
+        public bool CheckConnectInternet()
         {
+            if (token.IsCancellationRequested)
+                return true;
+
             var ping = new Ping();
             PingReply reply = ping.Send("instagram.com");
 
@@ -113,17 +124,16 @@ namespace InstagramSeleniumBot
                 Thread.Sleep(2000);
                 if (Convert.ToString(reply.Status) != "Success")
                 {
-                    Cons.WriteLine($"{Name}: Ошибка соеденения с сайтом");
+                    Cons.WriteLine($"Ошибка соеденения с сайтом");
                     Close();
                     return false;
                 }
             }
 
-
             return true;
         }
 
-        internal abstract void Start(int limit);
+        public abstract void Start(int limit);
     }
 
 

@@ -14,58 +14,53 @@ using System.Diagnostics;
 
 namespace InstagramSeleniumBot
 {
-    public partial class FormBot : Form
+    public partial class Form : System.Windows.Forms.Form
     {
-        private readonly Writer console;
-        private readonly FileReaderWriter fileReader;
-        private readonly List<Bot> bots;
-        public event Action EndWorkEvent = delegate { };
+        private readonly Writer Cons;
         List<Process> ProcessChromeDriver;
-
-        public FormBot()
+        CancellationTokenSource cts;
+        CancellationToken token;
+        public Form()
         {
             InitializeComponent();
+            ProcessChromeDriver = new List<Process>();
             StartPosition = FormStartPosition.Manual;
             Location = new Point(1300, 100);
-            
-            fileReader = new FileReaderWriter();
-            Task.Run(() => Timer(TimeSpan.FromMinutes(50))); //ограничение времени работы 50минут
-            console = new Writer(this, fileReader);
-            bots = new List<Bot>();
-
+            Cons = new Writer(Directory.GetCurrentDirectory(), this, textConsole);
            
-            Task.Run(() => Launch(new Info(console, ref EndWorkEvent, "InstaBot"), 50));
-            Task.Run(() => Launch(new CollectingAccounts(console, ref EndWorkEvent,"InstaBot"), 50));
-            Task.Run(() => Launch(new ProcessingAccounts(console, ref EndWorkEvent, "InstaBot"),50));
-            Task.Run(() => Launch(new SubscribeAccounts(console,  ref EndWorkEvent, "InstaBot"),  5));
-            Task.Run(() => Launch(new UnSubscribeAccounts(console, ref EndWorkEvent, "InstaBot"), 10));
+            Cons.WriteLine("Program loaded.");
+            Task.Run(() => BotWork());
+            cts = new CancellationTokenSource();
            
         }
 
+        private void BotWork()
+        {
+            token = cts.Token;
+            Task.Run(() => Timer(TimeSpan.FromMinutes(50))); //ограничение времени работы 50минут
+            Launch(new CollectingAccounts(Cons, token), 2);
+            Launch(new ProcessingAccounts(Cons, token), 2);
+            Launch(new SubscribeAccounts(Cons, token), 2);
+            Launch(new UnSubscribeAccounts(Cons, token), 2);
+            CloseProgram();
+        }
 
         private void Launch(Bot bot, int limit)
         {
-            bots.Add(bot);
-            bot.Autorize("gurillam", "70nCHwq");
-            bot.Start(limit);
-            Close(bot);
-        }
-
-        private void Close(Bot bot)
-        {
-            bot.Close();
-            bots.Remove(bot);
-            if (bots.Count == 0)
+            if (token.IsCancellationRequested)
             {
-                console.WriteLine("All bot stoped. Application closed.");
-                Thread.Sleep(TimeSpan.FromSeconds(5));
-                CloseProgram();
+                bot.Close();
+                return;
             }
+            bot.Autorize("gurillam", "VhZTtmBKZpTqG");
+            bot.Start(limit);
+            bot.Close();
+            Thread.Sleep(TimeSpan.FromSeconds(5));
         }
 
         private void Timer(TimeSpan time)
         {
-            ProcessChromeDriver = new List<Process>();
+            
             List<Process> processChromeDriverOld = Process.GetProcessesByName("chromedriver").ToList();
             Thread.Sleep(TimeSpan.FromSeconds(15));
             List<Process> ProcessChromeDriverNew = Process.GetProcessesByName("chromedriver").ToList();
@@ -74,28 +69,26 @@ namespace InstagramSeleniumBot
                 if (processChromeDriverOld.Find(item => item.Id == proces.Id) == null)
                     ProcessChromeDriver.Add(proces);
 
-
             Thread.Sleep(time);
-            console.WriteLine("Timer went off. Application closed.");
-
-            Task.Run(() => EndWorkEvent());
-            Thread.Sleep(TimeSpan.FromSeconds(30));
+            Cons.WriteLine("Timer went off. Application closed.");
+            Thread.Sleep(TimeSpan.FromSeconds(1));
             CloseProgram();
         }
 
         private void CloseProgram()
         {
+            cts.Cancel();
+            Cons.WriteLine("All bot stoped. Application closed.");
             foreach (Process proces in ProcessChromeDriver)
             {
-                Console.WriteLine($"proces: {proces.Id} Close.");
                 proces.CloseMainWindow();
             }
             Application.Exit();
         }
 
-        private void FormBot_FormClosed(object sender, FormClosedEventArgs e)
+        private void buttonStop_Click(object sender, EventArgs e)
         {
-            CloseProgram();
+            cts.Cancel();
         }
     }
 }

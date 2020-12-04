@@ -5,23 +5,26 @@ using System.Threading;
 
 namespace InstagramSeleniumBot
 {
-    
-    internal class SubscribeAccounts : Bot
+
+    public class SubscribeAccounts : Bot
     {
-        public SubscribeAccounts(Writer Cons,ref Action EndWorkEvent, string botProfileName) : base(Cons, ref EndWorkEvent,botProfileName)
-        {
-            Name = "SubscribeAccounts";
-        }
+        public SubscribeAccounts(Writer Cons, CancellationToken token) : base(Cons, token) {}
 
 
-        internal override void Start(int limit)
+        public override void Start(int limit)
         {
+            if (token.IsCancellationRequested)
+                return;
+            db.GetStatisticDB();
             for (int i = 0; i < limit; i++)
             {
+                if (token.IsCancellationRequested)
+                    return;
+
                 if (!db.GetUrlForSubscribe(out string url))
                     return;
 
-                Cons.WriteLine($"{Name} {i}).Подписка на {url}".Trim());
+                Cons.WriteLine($"{i}).Подписка на {url.Trim()}");
                 Chrome.OpenUrl(url);
 
                 if (!Subscribe(url))
@@ -29,8 +32,10 @@ namespace InstagramSeleniumBot
             }
         }
 
-        internal bool Subscribe(string url)
+        private bool Subscribe(string url)
         {
+            if (token.IsCancellationRequested)
+                return false;
 
 #if DEBUG
             Thread.Sleep(TimeSpan.FromSeconds(1));
@@ -41,14 +46,13 @@ namespace InstagramSeleniumBot
             IWebElement element = Chrome.FindWebElement(By.XPath(@"//button[contains(.,'Подписаться')]"));
             if (element == null) 
             {
-                Cons.WriteLine($"{Name} Не удалось подписаться.");
+                Cons.WriteLine($"Не удалось подписаться.");
                 db.MakeUrlNotInterest(url);
                 return true;
             }
             //Проверка на друзей 
 
             element.Click();
-
 
 #if DEBUG
             Thread.Sleep(TimeSpan.FromSeconds(1));
@@ -60,15 +64,14 @@ namespace InstagramSeleniumBot
             element = Chrome.FindWebElement(By.XPath(@"//button[contains(.,'Отправить сообщение')]"));
             if (element != null)
             {
-               
                 db.AddUrlToFriend(url);
                 return true;
             }
-            Cons.WriteLine($"{Name} Неудалось подписаться.");
+            Cons.WriteLine($"Не удалось подписаться.");
             element = Chrome.FindWebElement(By.XPath(@"//button[contains(.,'Сообщить о проблеме')]"));
             if (element != null)
             {
-                Cons.WriteLine($"{Name} Превышен лимит подписок.");
+                Cons.WriteLine($"Превышен лимит подписок.");
                 return false;
             }
 

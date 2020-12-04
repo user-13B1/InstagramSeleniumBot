@@ -4,43 +4,49 @@ using System.Threading;
 
 namespace InstagramSeleniumBot
 {
-    internal class UnSubscribeAccounts : Bot
+    public class UnSubscribeAccounts : Bot
     {
-        public UnSubscribeAccounts(Writer Cons,ref Action EndWorkEvent, string botProfileName) : base(Cons, ref EndWorkEvent,  botProfileName)
-        {
-            Name = "UnSubscribeAccounts";
-        }
+        public UnSubscribeAccounts(Writer Cons, CancellationToken token) : base(Cons, token) { }
 
-        internal override void Start(int limit)
+        public override void Start(int limit)
         {
-           
+            if (token.IsCancellationRequested)
+                return;
+            db.GetStatisticDB();
+
             for (int i = 0; i < limit; i++)
             {
-                if(!db.GetUrlForUnSubscribe(out string url))
+                if (token.IsCancellationRequested)
                     return;
 
-                db.MakeUrlNotInterest(url);
+                if (!db.GetUrlForUnSubscribe(out string url))
+                    return;
+                
                 UnSubscribe(url,i);
             }
-       
         }
 
-        private bool UnSubscribe(string url,int i)
+        public bool UnSubscribe(string url,int i)
         {
+            if (token.IsCancellationRequested)
+                return true;
+
+            db.MakeUrlNotInterest(url);
+
             IWebElement element;
             Chrome.OpenUrl(url);
            
             Thread.Sleep(TimeSpan.FromSeconds(2));
             if (Chrome.IsElementPage(By.LinkText("Назад в Instagram.")))
             {
-                Cons.WriteLine($"{Name} Страницы не существует.");
+                Cons.WriteLine($"Страницы не существует.");
                 return true;
             }
 
             string xpath = @"//*[@class='FLeXg bqE32']//button";
             Chrome.FindWebElement(By.XPath(xpath));
           
-            Cons.WriteLine($"{Name} Отписка {i} - {url.Trim()}");
+            Cons.WriteLine($"Отписка {i} - {url.Trim()}");
 
             Thread.Sleep(TimeSpan.FromSeconds(5 + rand.Next(10)));
             Chrome.ClickButtonXPath(xpath);
@@ -51,10 +57,10 @@ namespace InstagramSeleniumBot
             element = Chrome.FindWebElement(By.XPath(@"//button[contains(.,'Подписаться')]"));
             if (element == null)
             {
-                Cons.WriteLine($"{Name} Не удалось отписаться.");
+                Cons.WriteLine($"Не удалось отписаться.");
                 return false;
             }
-            Cons.WriteLine($"{Name} Отписаны.");
+            Cons.WriteLine($"Отписаны.");
             return true;
         }
 

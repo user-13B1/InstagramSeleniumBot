@@ -1,6 +1,6 @@
 ﻿namespace InstagramSeleniumBot
 {
-    partial class FormBot
+    partial class Form
     {
         /// <summary>
         /// Обязательная переменная конструктора.
@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.textConsole = new System.Windows.Forms.TextBox();
+            this.buttonStop = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textConsole
@@ -36,20 +37,30 @@
             this.textConsole.Location = new System.Drawing.Point(12, 12);
             this.textConsole.Multiline = true;
             this.textConsole.Name = "textConsole";
-            this.textConsole.Size = new System.Drawing.Size(414, 156);
+            this.textConsole.Size = new System.Drawing.Size(353, 156);
             this.textConsole.TabIndex = 0;
             // 
-            // FormBot
+            // buttonStop
+            // 
+            this.buttonStop.Location = new System.Drawing.Point(12, 174);
+            this.buttonStop.Name = "buttonStop";
+            this.buttonStop.Size = new System.Drawing.Size(75, 23);
+            this.buttonStop.TabIndex = 1;
+            this.buttonStop.Text = "Stop";
+            this.buttonStop.UseVisualStyleBackColor = true;
+            this.buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
+            // 
+            // Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(438, 175);
+            this.ClientSize = new System.Drawing.Size(377, 202);
+            this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.textConsole);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Name = "FormBot";
+            this.Name = "Form";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "InstagramBot";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormBot_FormClosed);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -58,6 +69,7 @@
         #endregion
 
         internal System.Windows.Forms.TextBox textConsole;
+        private System.Windows.Forms.Button buttonStop;
     }
 }
 

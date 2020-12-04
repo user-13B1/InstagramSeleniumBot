@@ -47,10 +47,13 @@ namespace InstagramSeleniumBot
         internal bool GetUrlForUnSubscribe(out string url)
         {
             var query = from user in db.GetTable<ParseInstagramUsers>()
-                        where user.Myfriend ==1
+                        where user.Myfriend == 1
                         where user.Myname == name
-                        orderby user.Date
+                        orderby user.Date 
                         select user;
+
+
+
 
             if (query.Count() == 0)
             {
@@ -59,7 +62,11 @@ namespace InstagramSeleniumBot
             }
 
             url = query.First().Url;
-          
+
+            TimeSpan time_interval = DateTime.Now.Subtract(query.First().Date);
+            Cons.WriteLine($"Unsubscribe time_interval {time_interval}");
+            if (time_interval < TimeSpan.FromDays(2))
+                return false;
             return true;
         }
 
@@ -98,7 +105,6 @@ namespace InstagramSeleniumBot
 
         internal bool AddUrlToFriend(string url)
         {
-            Cons.WriteLine($"Add Url To Friend.");
             ParseInstagramUsers user = db.GetTable<ParseInstagramUsers>().Where(u => u.Url == url).FirstOrDefault();
             user.Nointerst = 0;
             user.Myfriend = 1;
@@ -106,13 +112,14 @@ namespace InstagramSeleniumBot
             user.Donorsubs = 0;
             user.Awaiting = 0;
             user.Myname = name;
+            user.Date = DateTime.Now;
             db.SubmitChanges();
             return true;
         }
 
         internal bool AddUrlInMyFutereSubs(string url)
         {
-            Cons.WriteLine($"Add Url In My Futere Subs.");
+           
             ParseInstagramUsers user = db.GetTable<ParseInstagramUsers>().Where(u => u.Url == url).FirstOrDefault();
             user.Nointerst = 0;
             user.Myfriend = 0;
@@ -125,7 +132,7 @@ namespace InstagramSeleniumBot
 
         internal bool AddUrlInGetDonorSubsList(string url)
         {
-            Cons.WriteLine($"Add Url In Get Donor Subs List.");
+           
             ParseInstagramUsers user = db.GetTable<ParseInstagramUsers>().Where(u => u.Url == url).FirstOrDefault();
             user.Nointerst = 0;
             user.Myfriend = 0;
@@ -138,11 +145,11 @@ namespace InstagramSeleniumBot
 
         internal bool AddNewUrl(string url)
         {
-            Cons.WriteLine($"Add url - {url}");
+            if(string.IsNullOrEmpty(url))
+                return false;
+
             if (IsRepeat(url))
-            {
-                return true;
-            }
+                return false;
 
             ParseInstagramUsers newUser = new ParseInstagramUsers {Url=url, Myname=name, Date=DateTime.Now, Awaiting = 1, Tomakefriend=0, Myfriend=0, Nointerst=0, Donorsubs=0 };
             db.GetTable<ParseInstagramUsers>().InsertOnSubmit(newUser);
