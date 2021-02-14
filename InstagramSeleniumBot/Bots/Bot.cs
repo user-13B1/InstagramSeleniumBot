@@ -41,6 +41,7 @@ namespace InstagramSeleniumBot
             Chrome = new ChromeBrowser("InstagramBotProfile");
             Chrome.SetWindowSize(500, 1000);
             Cons.WriteLine($"Бот загружен.");
+           
         }
 
 
@@ -50,6 +51,8 @@ namespace InstagramSeleniumBot
                 return;
 
             db.Name = login;
+            db.GetStatisticDB();
+
             int delay = rand.Next(100);
             Thread.Sleep(delay);
             CheckConnectInternet();
@@ -135,11 +138,8 @@ namespace InstagramSeleniumBot
 
         public void CollectingAccounts(int limit)
         {
+            Cons.WriteLine("CollectingAccounts.");
             string pathScroll;
-            if (token.IsCancellationRequested)
-                return;
-           
-            db.GetStatisticDB();
 
             for (int j = 0; j < 30; j++)
             {
@@ -147,20 +147,22 @@ namespace InstagramSeleniumBot
                     return;
 
                 Thread.Sleep(2000 + rand.Next(100));
-                Chrome.MoveToElement(Chrome.FindWebElement(By.XPath($"/html/body/div[5]/div/div/div[1]")));
+                //Chrome.MoveToElement(Chrome.FindWebElement(By.XPath($"/html/body/div[5]/div/div/div[1]")));
 
                 for (int i = 1; i <= limit + 1; i++)
                 {
                     if (token.IsCancellationRequested)
                         return;
-
+                    
                     Thread.Sleep(50 + rand.Next(100));
-
+                  
                     pathScroll = $"//ul/div/li[{i}]";
 
                     if (!Chrome.FindWebElement(By.XPath(pathScroll)).Displayed)
+                    {
+                        Cons.WriteError($"Error scroll.");
                         break;
-
+                    }
                     Cons.WriteLine($"Scroll - {i}.");
 
                     if (!Chrome.Scroll(pathScroll))
@@ -228,7 +230,8 @@ namespace InstagramSeleniumBot
         {
             if (token.IsCancellationRequested)
                 return;
-            db.GetStatisticDB();
+
+            Cons.WriteLine($"ProcessingAccount");
             List<string> url = db.GetUrlAwaitingList(limit);      //Получить список аккаунтов
             for (int i = 0; i < url.Count; i++)
             {
@@ -317,7 +320,7 @@ namespace InstagramSeleniumBot
         {
             if (token.IsCancellationRequested)
                 return;
-            db.GetStatisticDB();
+          
             for (int i = 0; i < limit; i++)
             {
                 if (token.IsCancellationRequested)
@@ -393,7 +396,6 @@ namespace InstagramSeleniumBot
         {
             if (token.IsCancellationRequested)
                 return;
-            db.GetStatisticDB();
 
             for (int i = 0; i < limit; i++)
             {

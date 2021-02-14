@@ -195,6 +195,7 @@ namespace InstagramSeleniumBot
                     where user2.Tomakefriend == 1
                     orderby user2.Date
                     select user2;
+
             Cons.WriteLine($"Аккаунтов для подписки - {query.Count()}"); 
 
             query = from user3 in db.GetTable<ParseInstagramUsers>()
@@ -209,6 +210,11 @@ namespace InstagramSeleniumBot
                     select user4;
             Cons.WriteLine($"Аккаунтов для списка подписчиков - {query.Count()}");
 
+            query = from user5 in db.GetTable<ParseInstagramUsers>()
+                    orderby user5.Date
+                    select user5;
+
+            Cons.WriteLine($"Всего - {query.Count()}");
 
             return;
 

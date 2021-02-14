@@ -9,13 +9,13 @@ namespace InstagramSeleniumBot
 {
     public class Writer
     {
-        private readonly Form form;
+        private readonly InForm form;
         private readonly TextWriter _writer;
         private readonly string pathMessageLogTxtFile;
         private readonly string pathErrorLogTxtFile;
         private readonly object obj;
 
-        public Writer(string dataPathDir, Form form, TextBox textBox)
+        public Writer(string dataPathDir, InForm form, TextBox textBox)
         {
             this.form = form;
             obj = new object();

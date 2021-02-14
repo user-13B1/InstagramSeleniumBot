@@ -1,6 +1,6 @@
 ﻿namespace InstagramSeleniumBot
 {
-    partial class Form
+    partial class InForm
     {
         /// <summary>
         /// Обязательная переменная конструктора.
