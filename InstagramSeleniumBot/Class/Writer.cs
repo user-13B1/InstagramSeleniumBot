@@ -77,6 +77,7 @@ namespace InstagramSeleniumBot
             //Запись сообщения в лог файл
             string textStr = String.Format("{0:F}  Error: ", DateTime.Now) + String.Format($"{textObj}");
             WriteTextToFile(textStr, pathErrorLogTxtFile);
+         
         }
 
 

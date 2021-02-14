@@ -31,36 +31,27 @@ namespace InstagramSeleniumBot
             Cons.WriteLine("Program loaded.");
             Task.Run(() => BotWork());
             cts = new CancellationTokenSource();
-           
         }
 
         private void BotWork()
         {
             token = cts.Token;
             Task.Run(() => Timer(TimeSpan.FromMinutes(50))); //ограничение времени работы 50минут
-            Launch(new CollectingAccounts(Cons, token), 2);
-            Launch(new ProcessingAccounts(Cons, token), 2);
-            Launch(new SubscribeAccounts(Cons, token), 2);
-            Launch(new UnSubscribeAccounts(Cons, token), 2);
-            CloseProgram();
-        }
-
-        private void Launch(Bot bot, int limit)
-        {
-            if (token.IsCancellationRequested)
-            {
-                bot.Close();
-                return;
-            }
+            Bot bot = new Bot(Cons, token);
             bot.Autorize("gurillam", "VhZTtmBKZpTqG");
-            bot.Start(limit);
+           
+            bot.ProcessingAccounts(120);
+            bot.SubscribeAccounts(13);
+            bot.UnSubscribeAccounts(16);
+            bot.CollectingAccounts(120);
             bot.Close();
+            
             Thread.Sleep(TimeSpan.FromSeconds(5));
+            CloseProgram();
         }
 
         private void Timer(TimeSpan time)
         {
-            
             List<Process> processChromeDriverOld = Process.GetProcessesByName("chromedriver").ToList();
             Thread.Sleep(TimeSpan.FromSeconds(15));
             List<Process> ProcessChromeDriverNew = Process.GetProcessesByName("chromedriver").ToList();
