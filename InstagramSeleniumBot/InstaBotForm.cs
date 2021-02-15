@@ -11,7 +11,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Diagnostics;
-using System.Text.Json;
+
 
 namespace InstagramSeleniumBot
 {
@@ -24,35 +24,17 @@ namespace InstagramSeleniumBot
         public InForm()
         {
             InitializeComponent();
+            Cons = new Writer(Directory.GetCurrentDirectory(), this, textConsole);
+            Cons.WriteLine("Initializ");
             ProcessChromeDriver = new List<Process>();
             StartPosition = FormStartPosition.Manual;
             Location = new Point(1300, 100);
-            Cons = new Writer(Directory.GetCurrentDirectory(), this, textConsole);
-
-            Cons.WriteLine("Program loaded.");
-            Task.Run(() => BotWork());
+           
             cTokenSource = new CancellationTokenSource();
-
+            Task.Run(() => CloseAppTimer(TimeSpan.FromMinutes(50)));
         }
 
-        private void BotWork()
-        {
-            token = cTokenSource.Token;
-            Task.Run(() => StopAppTimer(TimeSpan.FromMinutes(50)));
-
-            Account acc = LoadFromFile();
-            Bot bot = new Bot(Cons, token);
-            bot.Autorize(acc.Login, acc.Pass);
-            bot.CollectingAccounts(150);
-            bot.ProcessingAccounts(120);
-            bot.SubscribeAccounts(13);
-            bot.UnSubscribeAccounts(16);
-            bot.Close();
-            
-            CloseProgram();
-        }
-
-        private void StopAppTimer(TimeSpan time)
+        private void CloseAppTimer(TimeSpan time)
         {
             List<Process> processChromeDriverOld = Process.GetProcessesByName("chromedriver").ToList();
             Thread.Sleep(TimeSpan.FromSeconds(15));
@@ -65,14 +47,14 @@ namespace InstagramSeleniumBot
             Thread.Sleep(time);
             Cons.WriteLine("Timer went off. Application closed.");
             Thread.Sleep(TimeSpan.FromSeconds(1));
-            CloseProgram();
+            CloseApp();
         }
 
-        private void CloseProgram()
+        private void CloseApp()
         {
             Thread.Sleep(TimeSpan.FromSeconds(4));
             cTokenSource.Cancel();
-            Cons.WriteLine("All bot stoped. Application closed.");
+            Cons.WriteLine("Application closed.");
             foreach (Process proces in ProcessChromeDriver)
             {
                 proces.CloseMainWindow();
@@ -80,38 +62,15 @@ namespace InstagramSeleniumBot
             Application.Exit();
         }
 
-        private void buttonStop_Click(object sender, EventArgs e) => cTokenSource.Cancel();
+        private void ButtonStop_Click(object sender, EventArgs e) => cTokenSource.Cancel();
 
-
-
-        Account LoadFromFile()
+        async private void InForm_Load(object sender, EventArgs e)
         {
-            string json = null;
-            string path = Directory.GetCurrentDirectory() + @"\accounts.txt";
-           
-            try
-            {
-                using (StreamReader sr = new StreamReader(path))
-                {
-                    json = sr.ReadLine();
-                }
-            }
-            catch (Exception e)
-            {
-                Cons.WriteLine(e.Message);
-            }
-            if (json != null)
-            {
-                Account acc = JsonSerializer.Deserialize<Account>(json);
-                return acc;
-            }
-
-            return null;
+            token = cTokenSource.Token;
+            Bot bot = new Bot(Cons, token);
+            await Task.Run(() => bot.Start());
+            CloseApp();
         }
     }
-    internal class Account
-    {
-        public string Login { get; set; }
-        public string Pass { get; set; }
-    }
+   
 }

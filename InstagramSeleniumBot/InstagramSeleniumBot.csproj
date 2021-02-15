@@ -80,6 +80,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Class\ReaderJson.cs" />
     <Compile Include="Class\DBmanager.cs" />
     <Compile Include="Class\Writer.cs" />
     <Compile Include="InstaBotForm.cs">

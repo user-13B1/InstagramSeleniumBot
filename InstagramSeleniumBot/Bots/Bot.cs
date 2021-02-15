@@ -16,6 +16,7 @@ using OpenQA.Selenium.Chrome;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices.WindowsRuntime;
 
+
 namespace InstagramSeleniumBot
 {
     public class Bot
@@ -34,16 +35,12 @@ namespace InstagramSeleniumBot
 
             this.token = token;
             Cons = console;
-
-            Cons.WriteLine($"Загрузка бота.");
+           
             db = new DBmanager(console);
             rand = new Random();
             Chrome = new ChromeBrowser("InstagramBotProfile");
             Chrome.SetWindowSize(500, 1000);
-            Cons.WriteLine($"Бот загружен.");
-           
         }
-
 
         public void Autorize(string login, string password)
         {
@@ -72,6 +69,18 @@ namespace InstagramSeleniumBot
             Chrome.ClickButtonXPath(@"//*[@id='loginForm']/div/div[3]/button");
 
             CheckAutorize();
+        }
+
+
+        internal void Start()
+        {
+            Account acc = ReaderJson.LoadAccountFromFile();
+            Autorize(acc.Login, acc.Pass);
+            CollectingAccounts(150);
+            ProcessingAccounts(120);
+            SubscribeAccounts(13);
+            UnSubscribeAccounts(16);
+            Close();
         }
 
         private void CheckAutorize()
@@ -197,7 +206,6 @@ namespace InstagramSeleniumBot
               
                 if (Chrome.ClickButtonXPath("//a[contains(.,'подписчиков')]"))
                     return true;
-
             }
             return false;
         }
@@ -447,8 +455,10 @@ namespace InstagramSeleniumBot
             return true;
         }
 
+
+       
     }
 
 
-
+   
 }

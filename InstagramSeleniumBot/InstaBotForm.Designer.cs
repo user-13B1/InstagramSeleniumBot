@@ -37,30 +37,31 @@
             this.textConsole.Location = new System.Drawing.Point(12, 12);
             this.textConsole.Multiline = true;
             this.textConsole.Name = "textConsole";
-            this.textConsole.Size = new System.Drawing.Size(353, 156);
+            this.textConsole.Size = new System.Drawing.Size(208, 156);
             this.textConsole.TabIndex = 0;
             // 
             // buttonStop
             // 
-            this.buttonStop.Location = new System.Drawing.Point(12, 174);
+            this.buttonStop.Location = new System.Drawing.Point(147, 174);
             this.buttonStop.Name = "buttonStop";
             this.buttonStop.Size = new System.Drawing.Size(75, 23);
             this.buttonStop.TabIndex = 1;
             this.buttonStop.Text = "Stop";
             this.buttonStop.UseVisualStyleBackColor = true;
-            this.buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
+            this.buttonStop.Click += new System.EventHandler(this.ButtonStop_Click);
             // 
-            // Form
+            // InForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(377, 202);
+            this.ClientSize = new System.Drawing.Size(234, 202);
             this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.textConsole);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Name = "Form";
+            this.Name = "InForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "InstagramBot";
+            this.Load += new System.EventHandler(this.InForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
