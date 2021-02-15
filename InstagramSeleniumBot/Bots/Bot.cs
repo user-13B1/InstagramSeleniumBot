@@ -57,12 +57,10 @@ namespace InstagramSeleniumBot
             Chrome.OpenUrl(@"https://www.instagram.com/?hl=ru");
          
             if (Chrome.FindWebElement(By.XPath("//a[@href ='/direct/inbox/']"))!=null)
-            {
-                Cons.WriteLine($"Пользователь авторизован.");
                 return;
-            }
+            
 
-            Cons.WriteLine($"Авторизация пользователя");
+            Cons.WriteLine($"User authorization");
             Chrome.SendKeysXPath(@"//*[@id='loginForm']/div/div[1]/div/label/input", login);
             Chrome.SendKeysXPath(@"//*[@id='loginForm']/div/div[2]/div/label/input", password);
             Thread.Sleep(300);
@@ -70,6 +68,7 @@ namespace InstagramSeleniumBot
 
             CheckAutorize();
         }
+
 
 
         internal void Start()
@@ -88,13 +87,13 @@ namespace InstagramSeleniumBot
             if (token.IsCancellationRequested)
                 return;
 
-            Cons.WriteLine($"Проверка авторизации.");
+            Cons.WriteLine($"Authorization check.");
             if (Chrome.FindWebElement(By.XPath("//a[@href ='/direct/inbox/']")) == null)
             {
-                Cons.WriteLine($"Ошибка авторизации.");
+                Cons.WriteLine($"Authorisation Error.");
                 Close();
             }
-            Cons.WriteLine($"Авторизовано.");
+           
         }
 
         public void Close()
@@ -117,7 +116,7 @@ namespace InstagramSeleniumBot
             }
 
             if (!Int32.TryParse(text, out int num))
-                Cons.WriteLine($"Ошибка парсинга строки в число - {text}");
+                Cons.WriteLine($"Error parsing string to number - {text}");
 
             return num;
         }
@@ -136,7 +135,7 @@ namespace InstagramSeleniumBot
                 Thread.Sleep(2000);
                 if (Convert.ToString(reply.Status) != "Success")
                 {
-                    Cons.WriteLine($"Ошибка соеденения с сайтом");
+                    Cons.WriteLine($"Website connection error");
                     Close();
                     return false;
                 }
@@ -176,7 +175,7 @@ namespace InstagramSeleniumBot
 
                     if (!Chrome.Scroll(pathScroll))
                     {
-                        Cons.WriteError($"Не удается проскролить.");
+                        Cons.WriteError($"Can't scroll.");
                         return;
                     }
 
@@ -184,7 +183,7 @@ namespace InstagramSeleniumBot
 
                     if (i == limit)
                     {
-                        Cons.WriteLine($"Сбор завершен.");
+                        Cons.WriteLine($"Collection completed.");
                         return;
                     }
                 }
@@ -219,14 +218,14 @@ namespace InstagramSeleniumBot
             IWebElement element = Chrome.FindWebElement(By.XPath(path));
             if (element == null)
             {
-                Cons.WriteError("Ссылка для подписок не найдена.");
+                Cons.WriteError("No subscription link found.");
                 return null;
             }
          
             string url = element.GetAttribute("href");
             if (url == null || url == "")
             {
-                Cons.WriteError("Ссылка на подписчика пуста.");
+                Cons.WriteError("Subscriber link is empty.");
                 return null;
             }
            
@@ -262,14 +261,14 @@ namespace InstagramSeleniumBot
             //проверка  загрузки страницы
             if (Chrome.FindWebElement(By.XPath(@"/html/body/div")) == null)
             {
-                Cons.WriteError($"Не удалось загрузить страницу.");
+                Cons.WriteError($"Failed to load page.");
                 return false;
             }
 
             //проверка существования страницы
-            if (Chrome.IsElementPage(By.LinkText("Назад в Instagram.")))
+            if (Chrome.IsElementPage(By.LinkText("Back on Instagram.")))
             {
-                Cons.WriteLine($"Страницы не существует.");
+                Cons.WriteLine($"The page does not exist.");
                 db.MakeUrlNotInterest(url);
                 return true;
             }
@@ -278,14 +277,14 @@ namespace InstagramSeleniumBot
             string xPath = @"//*[@id='react-root']/section/main/div/ul/li[2]/span/span";
             if (Chrome.IsElementPage(By.XPath(xPath)))
             {
-                Cons.WriteLine($"Страница закрыта.");
+                Cons.WriteLine($"The page is closed.");
                 db.MakeUrlNotInterest(url);
                 return true;
             }
 
             if (Chrome.FindWebElement(By.XPath(@"//button[contains(.,'Подписаться')]")) == null)
             {
-                Cons.WriteLine($"Кнопка подписаться не найдена.");
+                Cons.WriteLine($"Subscribe button not found.");
                 db.MakeUrlNotInterest(url);
                 return true;
             }
@@ -296,7 +295,7 @@ namespace InstagramSeleniumBot
             //забираем для списка подписок
             if (num_subs > 400)
             {
-                Cons.WriteLine($"Забираем для списка подписок.");
+                Cons.WriteLine($"For the list of subscriptions.");
                 db.AddUrlInGetDonorSubsList(url);
                 return true;
             }
@@ -304,7 +303,7 @@ namespace InstagramSeleniumBot
             //Забираем для подписки
             if (num_subs > 40 && num_subs < 200 && num_subs < 2000 && num_subc / num_subs >= 2)
             {
-                Cons.WriteLine($"Забираем для подписки.");
+                Cons.WriteLine($"For subscription.");
                 db.AddUrlInMyFutereSubs(url);
                 return true;
             }
@@ -337,7 +336,7 @@ namespace InstagramSeleniumBot
                 if (!db.GetUrlForSubscribe(out string url))
                     return;
 
-                Cons.WriteLine($"{i}).Подписка на {url.Trim()}");
+                Cons.WriteLine($"{i}).Subscription to {url.Trim()}");
                 Chrome.OpenUrl(url);
 
                 if (!Subscribe(url))
@@ -359,7 +358,7 @@ namespace InstagramSeleniumBot
             IWebElement element = Chrome.FindWebElement(By.XPath(@"//button[contains(.,'Подписаться')]"));
             if (element == null)
             {
-                Cons.WriteLine($"Не удалось подписаться.");
+                Cons.WriteLine($"Failed to subscribe.");
                 db.MakeUrlNotInterest(url);
                 return true;
             }
@@ -389,11 +388,11 @@ namespace InstagramSeleniumBot
             }
 
 
-            Cons.WriteLine($"Не удалось подписаться.");
+            Cons.WriteLine($"Failed to subscribe.");
             element = Chrome.FindWebElement(By.XPath(@"//button[contains(.,'Сообщить о проблеме')]"));
             if (element != null)
             {
-                Cons.WriteLine($"Превышен лимит подписок.");
+                Cons.WriteLine($"The subscription limit has been exceeded.");
                 return false;
             }
             db.AddUrlToFriend(url);
@@ -428,16 +427,16 @@ namespace InstagramSeleniumBot
             Chrome.OpenUrl(url);
 
             Thread.Sleep(TimeSpan.FromSeconds(2));
-            if (Chrome.IsElementPage(By.LinkText("Назад в Instagram.")))
+            if (Chrome.IsElementPage(By.LinkText("Back to Instagram.")))
             {
-                Cons.WriteLine($"Страницы не существует.");
+                Cons.WriteLine($"The page does not exist.");
                 return true;
             }
 
             string xpath = @"//*[@class='FLeXg bqE32']//button";
             Chrome.FindWebElement(By.XPath(xpath));
 
-            Cons.WriteLine($"Отписка {i} - {url.Trim()}");
+            Cons.WriteLine($"Unsubscribe {i} - {url.Trim()}");
 
             Thread.Sleep(TimeSpan.FromSeconds(5 + rand.Next(10)));
             Chrome.ClickButtonXPath(xpath);
@@ -448,10 +447,10 @@ namespace InstagramSeleniumBot
             element = Chrome.FindWebElement(By.XPath(@"//button[contains(.,'Подписаться')]"));
             if (element == null)
             {
-                Cons.WriteLine($"Не удалось отписаться.");
+                Cons.WriteLine($"Failed to unsubscribe.");
                 return false;
             }
-            Cons.WriteLine($"Отписаны.");
+            Cons.WriteLine($"Unsubscribed.");
             return true;
         }
 
