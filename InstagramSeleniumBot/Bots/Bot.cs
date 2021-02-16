@@ -27,7 +27,6 @@ namespace InstagramSeleniumBot
         private protected static Random rand;
         public bool stop;
         private protected CancellationToken token;
-
         public Bot(Writer console, CancellationToken token)
         {
             if (token.IsCancellationRequested)
@@ -41,7 +40,6 @@ namespace InstagramSeleniumBot
             Chrome = new ChromeBrowser("InstagramBotProfile");
             Chrome.SetWindowSize(500, 1000);
         }
-
         public void Autorize(string login, string password)
         {
             if (token.IsCancellationRequested)
@@ -68,8 +66,6 @@ namespace InstagramSeleniumBot
 
             CheckAutorize();
         }
-
-
 
         internal void Start()
         {
@@ -159,12 +155,12 @@ namespace InstagramSeleniumBot
 
                 for (int i = 1; i <= limit + 1; i++)
                 {
+                    pathScroll = $"//ul/div/li[{i}]";
+
                     if (token.IsCancellationRequested)
                         return;
-                    
+
                     Thread.Sleep(50 + rand.Next(100));
-                  
-                    pathScroll = $"//ul/div/li[{i}]";
 
                     if (!Chrome.FindWebElement(By.XPath(pathScroll)).Displayed)
                     {
@@ -186,6 +182,7 @@ namespace InstagramSeleniumBot
                         Cons.WriteLine($"Collection completed.");
                         return;
                     }
+                   
                 }
                
             }
@@ -453,8 +450,6 @@ namespace InstagramSeleniumBot
             Cons.WriteLine($"Unsubscribed.");
             return true;
         }
-
-
        
     }
 

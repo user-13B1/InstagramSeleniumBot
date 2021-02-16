@@ -15,17 +15,16 @@ using System.Diagnostics;
 
 namespace InstagramSeleniumBot
 {
-    public partial class InForm : System.Windows.Forms.Form
+    public partial class InForm : Form
     {
         private readonly Writer Cons;
-        List<Process> ProcessChromeDriver;
-        CancellationTokenSource cTokenSource;
+        readonly List<Process> ProcessChromeDriver;
+        readonly CancellationTokenSource cTokenSource;
         CancellationToken token;
         public InForm()
         {
             InitializeComponent();
             Cons = new Writer(Directory.GetCurrentDirectory(), this, textConsole);
-            Cons.WriteLine("Initializ");
             ProcessChromeDriver = new List<Process>();
             StartPosition = FormStartPosition.Manual;
             Location = new Point(1300, 100);
