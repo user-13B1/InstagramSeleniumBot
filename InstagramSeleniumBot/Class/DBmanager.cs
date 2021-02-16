@@ -14,13 +14,15 @@ namespace InstagramSeleniumBot
 {
     class DBmanager
     {
-        readonly string connectionString = @"Data Source=SERVER\SQLEXPRESS;Initial Catalog=LoaclBD;Integrated Security=False;Connect Timeout = 7;User Id = test;Password = 123;";
+        readonly string connectionString;
+       
         readonly Writer Cons;
         private string name;
         private readonly DataContext db;
         public DBmanager(Writer cons)
         {
             Cons = cons;
+            connectionString = ReaderFile.LoadCstringFromFile();
             db = new DataContext(connectionString);
         }
 

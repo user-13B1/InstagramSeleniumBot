@@ -9,7 +9,7 @@ using System.IO;
 
 namespace InstagramSeleniumBot
 {
-    static class ReaderJson
+    static class ReaderFile
     {
         public static Account LoadAccountFromFile()
         {
@@ -27,7 +27,20 @@ namespace InstagramSeleniumBot
             return acc;
         }
 
+
+        public static String LoadCstringFromFile()
+        {
+            string s = null;
+            string path = Directory.GetCurrentDirectory() + @"\ConnectionString.ini";
+            using (StreamReader sr = new StreamReader(path))
+            {
+                s = sr.ReadLine();
+            }
+
+            return s;
+        }
     }
+
 
     struct Account
     {

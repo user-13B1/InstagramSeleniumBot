@@ -69,7 +69,7 @@ namespace InstagramSeleniumBot
 
         internal void Start()
         {
-            Account acc = ReaderJson.LoadAccountFromFile();
+            Account acc = ReaderFile.LoadAccountFromFile();
             Autorize(acc.Login, acc.Pass);
             CollectingAccounts(150);
             ProcessingAccounts(120);
