@@ -191,35 +191,28 @@ namespace InstagramSeleniumBot
                         where user.Awaiting == 1
                         orderby user.Date
                         select user;
-            Cons.WriteLine($"Аккаунтов для обработки - {query.Count()}");
-
+            Cons.WriteLine($"Accounts to be processed - {query.Count()}");
+           
             query = from user2 in db.GetTable<ParseInstagramUsers>()
                     where user2.Tomakefriend == 1
                     orderby user2.Date
                     select user2;
 
-            Cons.WriteLine($"Аккаунтов для подписки - {query.Count()}"); 
+            Cons.WriteLine($"Subscription accounts - {query.Count()}"); 
 
             query = from user3 in db.GetTable<ParseInstagramUsers>()
                     where user3.Myfriend == 1
                     orderby user3.Date
                     select user3;
-            Cons.WriteLine($"Аккаунтов для отписки - {query.Count()}");
+            Cons.WriteLine($"Unsubscribe accounts - {query.Count()}");
 
             query = from user4 in db.GetTable<ParseInstagramUsers>()
                     where user4.Donorsubs == 1
                     orderby user4.Date
                     select user4;
-            Cons.WriteLine($"Аккаунтов для списка подписчиков - {query.Count()}");
-
-            query = from user5 in db.GetTable<ParseInstagramUsers>()
-                    orderby user5.Date
-                    select user5;
-
-            Cons.WriteLine($"Всего - {query.Count()}");
-
+            Cons.WriteLine($"Subscriber list accounts - {query.Count()}");
+          
             return;
-
         }
 
         internal void ClearDB()

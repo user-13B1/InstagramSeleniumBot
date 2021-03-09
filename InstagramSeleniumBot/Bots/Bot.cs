@@ -71,8 +71,8 @@ namespace InstagramSeleniumBot
         {
             Account acc = ReaderFile.LoadAccountFromFile();
             Autorize(acc.Login, acc.Pass);
-            CollectingAccounts(150);
-            ProcessingAccounts(120);
+            CollectingAccounts(15);
+            ProcessingAccounts(12);
             SubscribeAccounts(13);
             UnSubscribeAccounts(16);
             Close();
@@ -349,7 +349,7 @@ namespace InstagramSeleniumBot
 #if DEBUG
             Thread.Sleep(TimeSpan.FromSeconds(1));
 #else
-             Thread.Sleep(TimeSpan.FromSeconds(15 + rand.Next(15)));
+            Thread.Sleep(TimeSpan.FromSeconds(15 + rand.Next(15)));
 #endif
 
             IWebElement element = Chrome.FindWebElement(By.XPath(@"//button[contains(.,'Подписаться')]"));
